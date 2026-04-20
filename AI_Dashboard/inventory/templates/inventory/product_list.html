@@ -1,0 +1,317 @@
+<!-- templates/inventory/product_list.html -->
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لیست محصولات | داشبورد هوشمند تجارتی</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- تنظیمات Tailwind برای RTL -->
+    <script>
+        tailwind.config = {
+            corePlugins: {
+                preflight: false,
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;200;300;400;500;600;700;800;900&display=swap');
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+        }
+        /* سفارشی‌سازی اسکرول بار */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-[Vazirmatn]">
+
+    <div class="flex h-screen">
+        
+        <!-- ==================== سایدبار ==================== -->
+        <aside class="w-72 bg-gradient-to-b from-indigo-800 to-indigo-900 text-white shadow-xl">
+            <div class="p-6 border-b border-indigo-700">
+                <div class="flex items-center gap-3">
+                    <div class="text-3xl">📊</div>
+                    <div>
+                        <h1 class="text-xl font-bold">داشبورد هوشمند</h1>
+                        <p class="text-xs text-indigo-300 mt-1">سیستم پیش‌بینی مالی</p>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="p-4">
+                <div class="space-y-2">
+                    <a href="/dashboard/" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-indigo-700 transition-colors">
+                        <span>🏠</span>
+                        <span>داشبورد اصلی</span>
+                    </a>
+                    <a href="/dashboard/forecast/" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-indigo-700 transition-colors">
+                        <span>📈</span>
+                        <span>پیش‌بینی مالی</span>
+                    </a>
+                    <a href="/dashboard/kpi/" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-indigo-700 transition-colors">
+                        <span>📊</span>
+                        <span>شاخص‌های کلیدی</span>
+                    </a>
+                    <a href="/sales/" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-indigo-700 transition-colors">
+                        <span>💰</span>
+                        <span>مدیریت فروش</span>
+                    </a>
+                    <a href="/expenses/" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-indigo-700 transition-colors">
+                        <span>💸</span>
+                        <span>مدیریت هزینه‌ها</span>
+                    </a>
+                    <a href="/inventory/" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-indigo-700 shadow-lg">
+                        <span>📦</span>
+                        <span>مدیریت موجودی</span>
+                    </a>
+                </div>
+                
+                <div class="border-t border-indigo-700 my-4 pt-4">
+                    <a href="/accounts/logout/" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-600 transition-colors text-red-300 hover:text-white">
+                        <span>🚪</span>
+                        <span>خروج از سیستم</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+        
+        <!-- ==================== محتوای اصلی ==================== -->
+        <main class="flex-1 overflow-y-auto">
+            
+            <!-- هدر -->
+            <header class="bg-white shadow-sm border-b border-gray-200 px-8 py-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">📦 مدیریت موجودی</h1>
+                        <p class="text-gray-500 text-sm mt-1">لیست تمام محصولات و کالاها</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="text-left">
+                            <p class="text-sm text-gray-600">{{ request.user.get_full_name|default:request.user.username }}</p>
+                            <p class="text-xs text-gray-400">مدیر سیستم</p>
+                        </div>
+                        <div class="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold">
+                            {{ request.user.username|first|upper }}
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="p-8">
+                
+                <!-- کارت‌های آماری -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-xl shadow-sm p-6 border-r-4 border-indigo-500">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">کل محصولات</p>
+                                <p class="text-2xl font-bold text-gray-800 mt-2">{{ total_products }}</p>
+                            </div>
+                            <div class="text-3xl text-indigo-500">📦</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-sm p-6 border-r-4 border-green-500">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">ارزش کل موجودی</p>
+                                <p class="text-2xl font-bold text-gray-800 mt-2">{{ total_value|floatformat:0 }} AFN</p>
+                            </div>
+                            <div class="text-3xl text-green-500">💰</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-sm p-6 border-r-4 border-yellow-500">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">محصولات با موجودی کم</p>
+                                <p class="text-2xl font-bold text-yellow-600 mt-2">{{ low_stock_count }}</p>
+                            </div>
+                            <div class="text-3xl text-yellow-500">⚠️</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-sm p-6 border-r-4 border-blue-500">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">دسته‌بندی‌ها</p>
+                                <p class="text-2xl font-bold text-gray-800 mt-2">{{ categories|length }}</p>
+                            </div>
+                            <div class="text-3xl text-blue-500">🏷️</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- فیلترها و جستجو -->
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="md:col-span-2">
+                            <form method="GET" class="flex gap-2">
+                                <input type="text" name="search" value="{{ search }}" placeholder="جستجوی محصول..." class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                <button type="submit" class="px-6 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors">جستجو</button>
+                            </form>
+                        </div>
+                        
+                        <div>
+                            <select name="category" onchange="this.form.submit()" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="">همه دسته‌بندی‌ها</option>
+                                {% for cat in categories %}
+                                <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <a href="?low_stock=yes" class="block text-center px-4 py-2 border border-yellow-500 text-yellow-600 rounded-lg hover:bg-yellow-50 transition-colors">
+                                ⚠️ محصولات با موجودی کم
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- جدول محصولات -->
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th class="px-6 py-4 text-right text-sm font-semibold text-gray-600">کد محصول</th>
+                                    <th class="px-6 py-4 text-right text-sm font-semibold text-gray-600">نام محصول</th>
+                                    <th class="px-6 py-4 text-right text-sm font-semibold text-gray-600">دسته‌بندی</th>
+                                    <th class="px-6 py-4 text-center text-sm font-semibold text-gray-600">موجودی</th>
+                                    <th class="px-6 py-4 text-right text-sm font-semibold text-gray-600">قیمت واحد</th>
+                                    <th class="px-6 py-4 text-right text-sm font-semibold text-gray-600">ارزش کل</th>
+                                    <th class="px-6 py-4 text-center text-sm font-semibold text-gray-600">وضعیت</th>
+                                    <th class="px-6 py-4 text-center text-sm font-semibold text-gray-600">عملیات</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                {% for product in page_obj %}
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="px-6 py-4 text-sm text-gray-700 font-mono">{{ product.product_code }}</td>
+                                    <td class="px-6 py-4">
+                                        <div>
+                                            <p class="font-medium text-gray-800">{{ product.name }}</p>
+                                            {% if product.location %}
+                                            <p class="text-xs text-gray-400 mt-1">📍 {{ product.location }}</p>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs">{{ product.category|default:"بدون دسته" }}</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        {% if product.quantity <= product.reorder_level %}
+                                            <span class="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded-lg text-sm font-medium">
+                                                🔴 {{ product.quantity }}
+                                            </span>
+                                        {% elif product.quantity <= product.reorder_level|add:10 %}
+                                            <span class="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-700 rounded-lg text-sm font-medium">
+                                                🟡 {{ product.quantity }}
+                                            </span>
+                                        {% else %}
+                                            <span class="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-lg text-sm font-medium">
+                                                🟢 {{ product.quantity }}
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-700">{{ product.unit_price|floatformat:0 }} AFN</td>
+                                    <td class="px-6 py-4 text-sm font-medium text-indigo-600">{{ product.total_value|floatformat:0 }} AFN</td>
+                                    <td class="px-6 py-4 text-center">
+                                        {% if product.quantity == 0 %}
+                                            <span class="px-2 py-1 bg-red-100 text-red-700 rounded-lg text-xs">ناموجود</span>
+                                        {% elif product.quantity <= product.reorder_level %}
+                                            <span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-lg text-xs">موجودی کم</span>
+                                        {% else %}
+                                            <span class="px-2 py-1 bg-green-100 text-green-700 rounded-lg text-xs">موجود</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <div class="flex justify-center gap-2">
+                                            <a href="/inventory/products/detail/{{ product.id }}/" class="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors" title="جزئیات">
+                                                🔍
+                                            </a>
+                                            <a href="/inventory/products/edit/{{ product.id }}/" class="p-2 text-indigo-500 hover:bg-indigo-50 rounded-lg transition-colors" title="ویرایش">
+                                                ✏️
+                                            </a>
+                                            <a href="/inventory/products/delete/{{ product.id }}/" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="حذف">
+                                                🗑️
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="px-6 py-12 text-center text-gray-400">
+                                        <div class="text-5xl mb-3">📭</div>
+                                        <p>هیچ محصولی یافت نشد</p>
+                                        <a href="/inventory/products/add/" class="inline-block mt-3 px-4 py-2 bg-indigo-500 text-white rounded-lg text-sm">افزودن محصول جدید</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- صفحه‌بندی -->
+                    {% if page_obj.has_other_pages %}
+                    <div class="flex justify-between items-center px-6 py-4 bg-gray-50 border-t border-gray-200">
+                        <div class="text-sm text-gray-500">
+                            نمایش {{ page_obj.start_index }} تا {{ page_obj.end_index }} از {{ page_obj.paginator.count }} محصول
+                        </div>
+                        <div class="flex gap-2">
+                            {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                ← قبلی
+                            </a>
+                            {% endif %}
+                            
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                <span class="px-4 py-2 bg-indigo-500 text-white rounded-lg">{{ num }}</span>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <a href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                    {{ num }}
+                                </a>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                بعدی →
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- دکمه افزودن محصول جدید -->
+                <div class="fixed bottom-8 right-8">
+                    <a href="/inventory/products/add/" class="flex items-center gap-2 px-6 py-3 bg-indigo-500 text-white rounded-full shadow-lg hover:bg-indigo-600 transition-all hover:scale-105">
+                        <span class="text-xl">+</span>
+                        <span>افزودن محصول جدید</span>
+                    </a>
+                </div>
+                
+            </div>
+        </main>
+    </div>
+    
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!-- templates/dashboard/evaluation_form.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <h1 class="text-2xl font-bold mb-6">پرسشنامه ارزیابی داشبورد</h1>
+    
+    <form method="POST" action="{% url 'submit_evaluation' %}" class="bg-white p-6 rounded shadow">
+        {% csrf_token %}
+        
+        <div class="mb-4">
+            <label class="block mb-2">1. سرعت بارگذاری داشبورد چقدر است؟</label>
+            <select name="speed" class="w-full p-2 border rounded">
+                <option value="5">بسیار خوب (کمتر از 1 ثانیه)</option>
+                <option value="4">خوب (1-2 ثانیه)</option>
+                <option value="3">متوسط (2-3 ثانیه)</option>
+                <option value="2">ضعیف (3-5 ثانیه)</option>
+                <option value="1">بسیار ضعیف (بیشتر از 5 ثانیه)</option>
+            </select>
+        </div>
+        
+        <div class="mb-4">
+            <label class="block mb-2">2. دقت پیش‌بینی‌های سیستم چقدر است؟</label>
+            <select name="accuracy" class="w-full p-2 border rounded">
+                <option value="5">بسیار دقیق (خطا کمتر از 5%)</option>
+                <option value="4">دقیق (خطا 5-10%)</option>
+                <option value="3">متوسط (خطا 10-15%)</option>
+                <option value="2">نادقیق (خطا 15-20%)</option>
+                <option value="1">بسیار نادقیق (خطا بیشتر از 20%)</option>
+            </select>
+        </div>
+        
+        <div class="mb-4">
+            <label class="block mb-2">3. سهولت استفاده از رابط کاربری؟</label>
+            <select name="usability" class="w-full p-2 border rounded">
+                <option value="5">بسیار آسان</option>
+                <option value="4">آسان</option>
+                <option value="3">متوسط</option>
+                <option value="2">مشکل</option>
+                <option value="1">بسیار مشکل</option>
+            </select>
+        </div>
+        
+        <div class="mb-4">
+            <label class="block mb-2">4. کیفیت بصری نمودارها و گزارش‌ها؟</label>
+            <select name="visualization" class="w-full p-2 border rounded">
+                <option value="5">بسیار خوب</option>
+                <option value="4">خوب</option>
+                <option value="3">متوسط</option>
+                <option value="2">ضعیف</option>
+                <option value="1">بسیار ضعیف</option>
+            </select>
+        </div>
+        
+        <div class="mb-4">
+            <label class="block mb-2">5. چقدر این سیستم به تصمیم‌گیری شما کمک می‌کند؟</label>
+            <select name="decision_help" class="w-full p-2 border rounded">
+                <option value="5">کمک بسیار زیادی</option>
+                <option value="4">کمک زیادی</option>
+                <option value="3">کمک متوسط</option>
+                <option value="2">کمک کمی</option>
+                <option value="1">هیچ کمکی</option>
+            </select>
+        </div>
+        
+        <div class="mb-4">
+            <label class="block mb-2">پیشنهادات شما برای بهبود سیستم:</label>
+            <textarea name="suggestions" rows="4" class="w-full p-2 border rounded"></textarea>
+        </div>
+        
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+            ارسال نظرات
+        </button>
+    </form>
+</div>
+{% endblock %}
